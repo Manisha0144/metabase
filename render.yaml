@@ -2,15 +2,30 @@ services:
   - type: web
     name: metabase
     env: docker
-    repo: https://github.com/render-examples/metabase.git # optional
-    plan: standard # ensure that metabase has at least 2GB of RAM (defaults to starter)
+    repo: https://github.com/render-examples/metabase.git  # optional
+    plan: standard  # 1GB RAM (minimum), upgrade to "professional" (2GB) if needed
     autoDeploy: false
     envVars:
+      # --- Postgres DB Configuration ---
+      - key: MB_DB_TYPE
+        value: postgres  # Force Postgres (not H2)
       - key: MB_DB_CONNECTION_URI
         fromDatabase:
           name: elephant
           property: connectionString
+
+      # --- Memory Optimization (Prevent OOM Errors) ---
+      - key: MB_JAVA_OPTS
+        value: "-Xmx1g -Xms512m"  # Allocate 1GB max heap
+      - key: JAVA_TOOL_OPTIONS
+        value: "-Xmx1g -Xms512m"  # Backup JVM setting
+
+      # --- Required for Render ---
+      - key: PORT
+        value: "3000"  # Metabase default port
+
 databases:
   - name: elephant
     databaseName: metabasedb
-    ipAllowList: [] # only allow internal connections
+    user: metabase_user  # Explicit user (optional but recommended)
+    ipAllowList: []  # Only allow internal connections
