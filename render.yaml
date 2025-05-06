@@ -2,7 +2,7 @@ services:
   - type: web
     name: metabase
     env: docker
-    plan: standard  # Must specify "standard" (1GB) or "professional" (2GB)
+    plan: professional  # Must specify "standard" (1GB) or "professional" (2GB)
     memory: 1GB     # Explicitly enforce memory (Render sometimes ignores "plan")
     autoDeploy: false
     envVars:
