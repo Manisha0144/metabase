@@ -2,30 +2,35 @@ services:
   - type: web
     name: metabase
     env: docker
-    repo: https://github.com/render-examples/metabase.git  # optional
-    plan: standard  # 1GB RAM (minimum), upgrade to "professional" (2GB) if needed
+    plan: standard  # Must specify "standard" (1GB) or "professional" (2GB)
+    memory: 1GB     # Explicitly enforce memory (Render sometimes ignores "plan")
     autoDeploy: false
     envVars:
-      # --- Postgres DB Configuration ---
+      # --- Database (Postgres) ---
       - key: MB_DB_TYPE
-        value: postgres  # Force Postgres (not H2)
+        value: postgres
       - key: MB_DB_CONNECTION_URI
         fromDatabase:
           name: elephant
           property: connectionString
 
-      # --- Memory Optimization (Prevent OOM Errors) ---
+      # --- Memory Limits (Critical Fix) ---
       - key: MB_JAVA_OPTS
-        value: "-Xmx1g -Xms512m"  # Allocate 1GB max heap
+        value: "-Xmx768m -Xms512m"  # Conservative for 1GB container
       - key: JAVA_TOOL_OPTIONS
-        value: "-Xmx1g -Xms512m"  # Backup JVM setting
+        value: "-Xmx768m -Xms512m"  # Backup for JVM
 
-      # --- Required for Render ---
+      # --- Metabase Performance Tweaks ---
+      - key: MB_JETTY_MAXTHREADS
+        value: "50"  # Reduce threads to save RAM
+      - key: MB_JETTY_QUEUESIZE
+        value: "100" # Smaller queue size
+
+      # --- Render Required ---
       - key: PORT
-        value: "3000"  # Metabase default port
+        value: "3000"
 
 databases:
   - name: elephant
     databaseName: metabasedb
-    user: metabase_user  # Explicit user (optional but recommended)
-    ipAllowList: []  # Only allow internal connections
+    ipAllowList: []
