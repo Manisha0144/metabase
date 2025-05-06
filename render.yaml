@@ -16,9 +16,9 @@ services:
 
       # --- Memory Limits (Critical Fix) ---
       - key: MB_JAVA_OPTS
-        value: "-Xmx768m -Xms512m"  # Conservative for 1GB container
+        value: "-Xmx1.5g -Xms1g"  # Conservative for 1GB container
       - key: JAVA_TOOL_OPTIONS
-        value: "-Xmx768m -Xms512m"  # Backup for JVM
+        value: "-Xmx1.5g -Xms1g"  # Backup for JVM
 
       # --- Metabase Performance Tweaks ---
       - key: MB_JETTY_MAXTHREADS
